@@ -407,36 +407,55 @@ function Gotham:CreateWindow(config: WindowConfig)
         Parent = CoreGui
     })
     
-    -- Loading Effect (Like Arkham HUD)
+    -- Loading Effect (Like Arkham HUD) - REDUCED SIZE
     local LoadFrame = Utils.Create("Frame", {
         BackgroundColor3 = ArkhamTheme.Background,
-        Size = UDim2.new(1, 0, 1, 0),
-        ZIndex = 1000,
+        Size = UDim2.fromOffset(400, 220),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        ZIndex = 1100,
         Parent = Root
     })
+    Utils.Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = LoadFrame })
+    local LoadStroke = Utils.Create("UIStroke", { Color = ArkhamTheme.Accent, Thickness = 2, Parent = LoadFrame })
+    
     local LoadLines = Utils.Create("Frame", {
         BackgroundColor3 = ArkhamTheme.Accent,
         BackgroundTransparency = 0.8,
-        Size = UDim2.new(1, 0, 0, 1),
-        Position = UDim2.new(0, 0, 0, 0),
+        Size = UDim2.new(1, -20, 0, 1),
+        Position = UDim2.new(0.5, 0, 0, 10),
+        AnchorPoint = Vector2.new(0.5, 0),
         Parent = LoadFrame
     })
-    Animate.Property(LoadLines, TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), { Position = UDim2.new(0, 0, 1, 0) })
+    Animate.Property(LoadLines, TweenInfo.new(1.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), { Position = UDim2.new(0.5, 0, 1, -10) })
     
     local LoadLabel = Utils.Create("TextLabel", {
-        Text = string.upper(config.LoadingTitle or "GOTHAM TACTICAL INTERFACE"),
+        Text = string.upper(config.LoadingTitle or "GOTHAM COMMAND"),
         Font = ArkhamTheme.FontBold,
-        TextColor3 = ArkhamTheme.Accent,
-        TextSize = 24,
+        TextColor3 = ArkhamTheme.TextPrimary,
+        TextSize = 20,
         Position = UDim2.new(0.5, 0, 0.45, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundTransparency = 1,
         Parent = LoadFrame
     })
     
+    local LoadSub = Utils.Create("TextLabel", {
+        Text = "VERIFICANDO IDENTIDAD...",
+        Font = ArkhamTheme.FontLight,
+        TextColor3 = ArkhamTheme.Accent,
+        TextSize = 12,
+        Position = UDim2.new(0.5, 0, 0.6, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundTransparency = 1,
+        Parent = LoadFrame
+    })
+    
     task.delay(1.5, function()
-        Animate.Property(LoadFrame, Animate.Presets.Smooth, { BackgroundTransparency = 1 })
+        Animate.Property(LoadFrame, Animate.Presets.Smooth, { BackgroundTransparency = 1, Size = UDim2.fromOffset(450, 270) })
         Animate.Property(LoadLabel, Animate.Presets.Smooth, { TextTransparency = 1 })
+        Animate.Property(LoadSub, Animate.Presets.Smooth, { TextTransparency = 1 })
+        Animate.Property(LoadStroke, Animate.Presets.Smooth, { Transparency = 1 })
         task.delay(0.5, function() LoadFrame:Destroy() end)
     end)
     
@@ -444,62 +463,70 @@ function Gotham:CreateWindow(config: WindowConfig)
     local Main = Utils.Create("Frame", {
         Name = "MainWindow",
         BackgroundColor3 = ArkhamTheme.Background,
-        Size = UDim2.fromOffset(650, 480),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
+        Size = UDim2.fromOffset(600, 450),
+        Position = UDim2.new(0.5, 0, 0.5, 20),
         AnchorPoint = Vector2.new(0.5, 0.5),
         ClipsDescendants = false,
         Parent = Root
     })
-    Utils.Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = Main })
+    Utils.Create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = Main })
     Utils.Create("UIStroke", { Color = ArkhamTheme.Stroke, Thickness = 2, Parent = Main })
     Utils.AddShadow(Main)
     Utils.AddCarbon(Main)
     
-    -- Sidebar (Navigation)
-    local Sidebar = Utils.Create("Frame", {
-        Name = "Sidebar",
+    -- Horizontal Header (Navigation)
+    local Header = Utils.Create("Frame", {
+        Name = "Header",
         BackgroundColor3 = ArkhamTheme.Secondary,
-        Size = UDim2.new(0, 180, 1, 0),
+        Size = UDim2.new(1, 0, 0, 45),
         Parent = Main
     })
-    Utils.Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = Sidebar })
+    Utils.Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = Header })
     Utils.Create("Frame", {
         BackgroundColor3 = ArkhamTheme.Secondary,
-        Size = UDim2.new(0, 20, 1, 0),
-        Position = UDim2.new(1, -20, 0, 0),
+        Position = UDim2.new(0, 0, 1, -10),
+        Size = UDim2.new(1, 0, 0, 10),
         BorderSizePixel = 0,
-        Parent = Sidebar
+        Parent = Header
     }) -- Corner fix
+    Utils.Create("UIStroke", { Color = ArkhamTheme.Stroke, Thickness = 1.5, Parent = Header })
+    
+    local Title = Utils.Create("TextLabel", {
+        Text = "GOTHAM COMMAND CENTER",
+        Font = ArkhamTheme.FontBold,
+        TextColor3 = ArkhamTheme.Accent,
+        TextSize = 12,
+        Position = UDim2.new(0, 20, 0.5, 0),
+        AnchorPoint = Vector2.new(0, 0.5),
+        Size = UDim2.new(0, 150, 0, 20),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        BackgroundTransparency = 1,
+        Parent = Header
+    })
     
     local NavHolder = Utils.Create("ScrollingFrame", {
         Name = "NavHolder",
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 1, -80),
-        Position = UDim2.new(0, 0, 0, 60),
+        Size = UDim2.new(1, -160, 1, 0),
+        Position = UDim2.new(0, 150, 0, 0),
         CanvasSize = UDim2.new(0, 0, 0, 0),
         ScrollBarThickness = 0,
-        Parent = Sidebar
+        Parent = Header
     })
-    Utils.Create("UIListLayout", { Padding = UDim.new(0, 5), HorizontalAlignment = Enum.HorizontalAlignment.Center, Parent = NavHolder })
-    
-    local Title = Utils.Create("TextLabel", {
-        Text = "WAYNE TECH",
-        Font = ArkhamTheme.FontBold,
-        TextColor3 = ArkhamTheme.Accent,
-        TextSize = 14,
-        Position = UDim2.new(0, 20, 0, 25),
-        Size = UDim2.new(1, -20, 0, 20),
-        TextXAlignment = Enum.TextXAlignment.Left,
-        BackgroundTransparency = 1,
-        Parent = Sidebar
+    Utils.Create("UIListLayout", { 
+        FillDirection = Enum.FillDirection.Horizontal, 
+        Padding = UDim.new(0, 15), 
+        HorizontalAlignment = Enum.HorizontalAlignment.Left, 
+        VerticalAlignment = Enum.VerticalAlignment.Center,
+        Parent = NavHolder 
     })
     
-    -- Content Area
+    -- Content Area (SHIFTED DOWN)
     local Container = Utils.Create("Frame", {
         Name = "Container",
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, -190, 1, -20),
-        Position = UDim2.new(0, 190, 0, 10),
+        Size = UDim2.new(1, -20, 1, -65),
+        Position = UDim2.new(0, 10, 0, 55),
         Parent = Main
     })
     
@@ -512,13 +539,13 @@ function Gotham:CreateWindow(config: WindowConfig)
     
     -- Dragging Logic
     local dragging, dragInput, dragStart, startPos
-    Main.InputBegan:Connect(function(input)
+    Header.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true; dragStart = input.Position; startPos = Main.Position
             input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
         end
     end)
-    Main.InputChanged:Connect(function(input)
+    Header.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
     end)
     UserInputService.InputChanged:Connect(function(input)
@@ -539,13 +566,23 @@ function Gotham:CreateWindow(config: WindowConfig)
             Text = string.upper(name),
             Font = ArkhamTheme.Font,
             TextColor3 = ArkhamTheme.TextSecondary,
-            TextSize = 13,
-            BackgroundColor3 = ArkhamTheme.Tertiary,
+            TextSize = 12,
             BackgroundTransparency = 1,
-            Size = UDim2.new(0.9, 0, 0, 36),
+            Size = UDim2.new(0, 100, 1, 0),
             Parent = NavHolder
         })
-        Utils.Create("UICorner", { CornerRadius = UDim.new(0, 5), Parent = TabBtn })
+        
+        local Indicator = Utils.Create("Frame", {
+            Name = "Indicator",
+            BackgroundColor3 = ArkhamTheme.Accent,
+            Size = UDim2.new(1, 0, 0, 2),
+            Position = UDim2.new(0, 0, 1, -2),
+            BorderSizePixel = 0,
+            BackgroundTransparency = 1,
+            Parent = TabBtn
+        })
+        
+        NavHolder.CanvasSize = UDim2.new(0, NavHolder:FindFirstChildOfClass("UIListLayout").AbsoluteContentSize.X + 10, 0, 0)
         
         local Page = Utils.Create("ScrollingFrame", {
             Name = "Page_" .. name,
@@ -558,16 +595,18 @@ function Gotham:CreateWindow(config: WindowConfig)
             Parent = TabContainer
         })
         local PageLayout = Utils.Create("UIListLayout", { Padding = UDim.new(0, 10), Parent = Page })
-        Utils.Create("UIPadding", { PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 10), PaddingTop = UDim.new(0, 5), Parent = Page })
+        Utils.Create("UIPadding", { PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 15), PaddingTop = UDim.new(0, 10), Parent = Page })
         
         local function OpenTab()
             if WindowAPI._activeTab then
                 WindowAPI._activeTab.Page.Visible = false
-                Animate.Property(WindowAPI._activeTab.Btn, Animate.Presets.Fast, { TextColor3 = ArkhamTheme.TextSecondary, BackgroundTransparency = 1 })
+                Animate.Property(WindowAPI._activeTab.Btn, Animate.Presets.Fast, { TextColor3 = ArkhamTheme.TextSecondary })
+                Animate.Property(WindowAPI._activeTab.Indicator, Animate.Presets.Fast, { BackgroundTransparency = 1 })
             end
             Page.Visible = true
-            WindowAPI._activeTab = { Page = Page, Btn = TabBtn }
-            Animate.Property(TabBtn, Animate.Presets.Fast, { TextColor3 = ArkhamTheme.Accent, BackgroundTransparency = 0 })
+            WindowAPI._activeTab = { Page = Page, Btn = TabBtn, Indicator = Indicator }
+            Animate.Property(TabBtn, Animate.Presets.Fast, { TextColor3 = ArkhamTheme.Accent })
+            Animate.Property(Indicator, Animate.Presets.Fast, { BackgroundTransparency = 0 })
             AudioManager.Play("Click")
         end
         
@@ -1083,40 +1122,56 @@ function Gotham:CreateWindow(config: WindowConfig)
         function TabAPI:BuildDetectivePreview(config: { Enabled: boolean })
             if not config.Enabled then return end
             
-            local PreviewFrame = Utils.Create("Frame", {
-                Name = "DetectivePreview",
-                BackgroundColor3 = Color3.new(0,0,0),
-                Size = UDim2.new(1, 0, 0, 300),
+            local PreviewOuter = Utils.Create("Frame", {
+                Name = "DetectivePreviewOuter",
+                BackgroundColor3 = ArkhamTheme.Secondary,
+                Size = UDim2.new(1, 0, 0, 320),
                 Parent = Page
             })
-            Utils.Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = PreviewFrame })
-            local Stroke = Utils.Create("UIStroke", { Color = ArkhamTheme.Accent, Thickness = 2, Parent = PreviewFrame })
+            Utils.Create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = PreviewOuter })
+            Utils.Create("UIStroke", { Color = ArkhamTheme.Stroke, Thickness = 1.5, Parent = PreviewOuter })
+
+            local PreviewFrame = Utils.Create("Frame", {
+                Name = "DetectivePreview",
+                BackgroundColor3 = Color3.new(0.02, 0.03, 0.05),
+                Size = UDim2.new(1, -20, 1, -20),
+                Position = UDim2.new(0.5, 0, 0.5, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                ClipsDescendants = true,
+                Parent = PreviewOuter
+            })
+            Utils.Create("UICorner", { CornerRadius = UDim.new(0, 8), Parent = PreviewFrame })
             
             -- Scanline effect
             local Scanline = Utils.Create("Frame", {
                 BackgroundColor3 = ArkhamTheme.Accent,
-                BackgroundTransparency = 0.9,
+                BackgroundTransparency = 0.85,
                 Size = UDim2.new(1, 0, 0, 2),
                 Position = UDim2.new(0, 0, 0, 0),
-                ZIndex = 5,
+                ZIndex = 10,
                 Parent = PreviewFrame
             })
-            Animate.Property(Scanline, TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), { Position = UDim2.new(0, 0, 1, 0) })
+            Animate.Property(Scanline, TweenInfo.new(2.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), { Position = UDim2.new(0, 0, 1, 0) })
             
             -- Character Model Simulation
             local Dummy = Utils.Create("ImageLabel", {
-                Image = "rbxassetid://109556531456186", -- Persona silueta
-                ImageColor3 = ArkhamTheme.TextSecondary,
+                Name = "BatmanDummy",
+                Image = "rbxassetid://109556531456186",
+                ImageColor3 = ArkhamTheme.Accent,
+                ImageTransparency = 0.2,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(0, 120, 0, 220),
-                Position = UDim2.new(0.5, 0, 0.5, 0),
+                ScaleType = Enum.ScaleType.Fit,
+                Size = UDim2.new(0, 180, 0, 250),
+                Position = UDim2.new(0.5, 0, 0.5, 20),
                 AnchorPoint = Vector2.new(0.5, 0.5),
+                ZIndex = 5,
                 Parent = PreviewFrame
             })
             
             local Overlay = Utils.Create("Frame", {
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 1, 0),
+                ZIndex = 6,
                 Parent = PreviewFrame
             })
             
@@ -1128,36 +1183,40 @@ function Gotham:CreateWindow(config: WindowConfig)
                     Size = size,
                     Position = pos,
                     Rotation = rot or 0,
+                    ZIndex = 7,
                     Parent = Overlay
                 })
             end
             
             -- Corner Boxes (Arkham Style)
-            local cl = 20
-            CreateESPLine("TLH", UDim2.new(0.5, -60, 0.5, -110), UDim2.fromOffset(cl, 1))
-            CreateESPLine("TLV", UDim2.new(0.5, -60, 0.5, -110), UDim2.fromOffset(1, cl))
+            local cl = 25
+            local bx, by, bw, bh = 0.5, 0.5, 120, 220
             
-            CreateESPLine("TRH", UDim2.new(0.5, 60-cl, 0.5, -110), UDim2.fromOffset(cl, 1))
-            CreateESPLine("TRV", UDim2.new(0.5, 60, 0.5, -110), UDim2.fromOffset(1, cl))
+            CreateESPLine("TLH", UDim2.new(bx, -60, by, -100), UDim2.fromOffset(cl, 1.5))
+            CreateESPLine("TLV", UDim2.new(bx, -60, by, -100), UDim2.fromOffset(1.5, cl))
             
-            CreateESPLine("BLH", UDim2.new(0.5, -60, 0.5, 110), UDim2.fromOffset(cl, 1))
-            CreateESPLine("BLV", UDim2.new(0.5, -60, 0.5, 110-cl), UDim2.fromOffset(1, cl))
+            CreateESPLine("TRH", UDim2.new(bx, 60-cl, by, -100), UDim2.fromOffset(cl, 1.5))
+            CreateESPLine("TRV", UDim2.new(bx, 60, by, -100), UDim2.fromOffset(1.5, cl))
             
-            CreateESPLine("BRH", UDim2.new(0.5, 60-cl, 0.5, 110), UDim2.fromOffset(cl, 1))
-            CreateESPLine("BRV", UDim2.new(0.5, 60, 0.5, 110-cl), UDim2.fromOffset(1, cl))
+            CreateESPLine("BLH", UDim2.new(bx, -60, by, 120), UDim2.fromOffset(cl, 1.5))
+            CreateESPLine("BLV", UDim2.new(bx, -60, by, 120-cl), UDim2.fromOffset(1.5, cl))
+            
+            CreateESPLine("BRH", UDim2.new(bx, 60-cl, by, 120), UDim2.fromOffset(cl, 1.5))
+            CreateESPLine("BRV", UDim2.new(bx, 60, by, 120-cl), UDim2.fromOffset(1.5, cl))
             
             -- Info HUD
             local InfoBox = Utils.Create("Frame", {
                 BackgroundColor3 = Color3.new(0,0,0),
-                BackgroundTransparency = 0.5,
-                Size = UDim2.fromOffset(140, 50),
-                Position = UDim2.new(0.5, 75, 0.5, -80),
+                BackgroundTransparency = 0.4,
+                Size = UDim2.fromOffset(150, 60),
+                Position = UDim2.new(0.5, 80, 0.5, -60),
+                ZIndex = 8,
                 Parent = PreviewFrame
             })
-            Utils.Create("UIStroke", { Color = ArkhamTheme.Accent, Thickness = 0.5, Parent = InfoBox })
+            Utils.Create("UIStroke", { Color = ArkhamTheme.Accent, Thickness = 0.8, Parent = InfoBox })
             
             Utils.Create("TextLabel", {
-                Text = "SUBJECT: TARGET_BRAVO\nDIST: 42.8m\nSTATUS: HOSTILE",
+                Text = "STATUS: DETECTED\nTARGET: ARMORED_THUG\nDIST: 12.4m\nTHREAT: LOW",
                 Font = Enum.Font.Code,
                 TextColor3 = ArkhamTheme.Accent,
                 TextSize = 10,
@@ -1165,13 +1224,15 @@ function Gotham:CreateWindow(config: WindowConfig)
                 Position = UDim2.fromOffset(5, 5),
                 BackgroundTransparency = 1,
                 TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 9,
                 Parent = InfoBox
             })
             
             -- Connection line
-            CreateESPLine("Conn", UDim2.new(0.5, 60, 0.5, -30), UDim2.fromOffset(15, 1), 25)
+            CreateESPLine("Conn", UDim2.new(0.5, 60, 0.5, 10), UDim2.fromOffset(20, 1), 35)
             
-            return PreviewFrame
+            Page.CanvasSize = UDim2.new(0, 0, 0, PageLayout.AbsoluteContentSize.Y + 20)
+            return PreviewOuter
         end
 
         function TabAPI:AddSeparator()
